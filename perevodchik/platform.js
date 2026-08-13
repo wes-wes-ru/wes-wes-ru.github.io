@@ -43,14 +43,13 @@ window.App = (function () {
 
   function applyInsets() {
     if (!inTG) return;
-    var bottom = 0, top = 0;
-    if (tg.safeAreaInset) { bottom = tg.safeAreaInset.bottom || 0; top = tg.safeAreaInset.top || 0; }
-    if (tg.contentSafeAreaInset) {
-      bottom = Math.max(bottom, tg.contentSafeAreaInset.bottom || 0);
-      top = Math.max(top, tg.contentSafeAreaInset.top || 0);
-    }
-    document.documentElement.style.setProperty("--safe-b", bottom + "px");
+    /* safeAreaInset — вырез самого телефона, contentSafeAreaInset — шапка Telegram
+       поверх страницы. Складываются: контент должен начинаться ниже обоих. */
+    var top = 0, bottom = 0;
+    if (tg.safeAreaInset) { top += tg.safeAreaInset.top || 0; bottom += tg.safeAreaInset.bottom || 0; }
+    if (tg.contentSafeAreaInset) { top += tg.contentSafeAreaInset.top || 0; bottom += tg.contentSafeAreaInset.bottom || 0; }
     document.documentElement.style.setProperty("--safe-t", top + "px");
+    document.documentElement.style.setProperty("--safe-b", bottom + "px");
   }
 
   /* ── хранилище: CloudStorage, если есть, иначе localStorage ──
@@ -236,6 +235,10 @@ window.App = (function () {
         tg.onEvent("contentSafeAreaChanged", applyInsets);
       }
       tg.onEvent("viewportChanged", applyInsets);
+      /* вебвью Telegram иногда открывает страницу чуть проскролленной —
+         с виду «пустой фон сверху, текст обрезан». Прибиваем к началу. */
+      window.scrollTo(0, 0);
+      setTimeout(function () { window.scrollTo(0, 0); applyInsets(); }, 300);
     }
     initScheme();
   }

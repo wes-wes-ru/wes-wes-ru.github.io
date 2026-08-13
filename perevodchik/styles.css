@@ -50,7 +50,7 @@ html, body {
   overscroll-behavior-y: none;
 }
 
-body { padding-bottom: calc(84px + var(--safe-b)); }
+body { padding-top: var(--safe-t); padding-bottom: calc(84px + var(--safe-b)); }
 
 .wrap { max-width: 560px; margin: 0 auto; padding: 0 var(--pad); }
 
@@ -223,7 +223,7 @@ h3 { font-size: 17px; font-weight: 700; letter-spacing: -.01em; }
 .dock .inner { max-width: 560px; margin: 0 auto; }
 
 .topbar {
-  position: sticky; top: 0; z-index: 30; background: var(--bg);
+  position: sticky; top: var(--safe-t); z-index: 30; background: var(--bg);
   padding: 12px 0 8px; display: flex; align-items: center; gap: 12px;
 }
 .back {
