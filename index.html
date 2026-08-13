@@ -15,9 +15,11 @@
     background:var(--cream); color:var(--wine); min-height:100vh;
     font:16px/1.5 -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
     -webkit-font-smoothing:antialiased;
-    display:flex; align-items:center; justify-content:center; padding:32px 20px;
+    /* контент прижат к верху: в мини-аппе Telegram вертикальное центрирование
+       оставляет пустую дыру сверху и прячет кнопки под низ экрана */
+    padding:calc(28px + env(safe-area-inset-top,0px)) 20px calc(36px + env(safe-area-inset-bottom,0px));
   }
-  .wrap { max-width:460px; width:100%; }
+  .wrap { max-width:460px; width:100%; margin:0 auto; }
   .kicker { font-size:13px; font-weight:700; color:var(--muted); margin-bottom:14px; }
   h1 { font-size:clamp(34px,11vw,50px); line-height:.95; font-weight:800; letter-spacing:-.025em; text-transform:uppercase; }
   .lead { font-size:17px; line-height:1.45; opacity:.82; margin:18px 0 30px; }
@@ -29,6 +31,22 @@
   a.item span { display:block; font-size:14px; color:var(--muted); margin-top:4px; }
   .foot { text-align:center; color:var(--muted); font-size:13px; padding-top:26px; }
 </style>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script>
+  /* внутри Telegram: развернуть на весь экран и покрасить шапку в цвет страницы */
+  (function () {
+    var tg = window.Telegram && window.Telegram.WebApp;
+    if (!tg || !tg.initData) return;
+    try { tg.ready(); tg.expand(); } catch (e) {}
+    function paint() {
+      var dark = tg.colorScheme === "dark";
+      var bg = dark ? "#150A0E" : "#F7F0EA";
+      try { tg.setHeaderColor(bg); tg.setBackgroundColor(bg); } catch (e) {}
+    }
+    paint();
+    tg.onEvent("themeChanged", paint);
+  })();
+</script>
 </head>
 <body>
 <div class="wrap">
