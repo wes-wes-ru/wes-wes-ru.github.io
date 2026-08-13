@@ -104,7 +104,7 @@
           '<p class="small">Второе приложение: 20 вопросов — и вы увидите свод правил, по которым вас растили, пять шкал вашей тени и три шага на эту неделю.</p>' +
           '<button class="btn ghost" id="toInstr" style="margin-top:14px">Пройти</button>' +
         "</div>" +
-        '<div class="foot">' + CARDS.length + " фраз · Анастасия Ерасова, психолог" + CFG.legalFoot() + "</div>" +
+        '<div class="foot">' + CARDS.length + " фраз · Анастасия Ерасова, психолог</div>" +
       "</div>";
 
     var q = document.getElementById("q");

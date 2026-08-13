@@ -27,7 +27,9 @@ window.CFG = {
   RAZBOR_ENABLED_TG: false,   /* поднять после создания автоматизаций в Chatplace */
   RAZBOR_ENABLED_VK: false,
 
-  /* Документы школы — показываются в подвале приложений */
+  /* Документы школы. В приложениях НЕ показываются — приложения данных не собирают
+     (ответы остаются в телефоне). Согласие живёт в точках сбора: в первых сообщениях
+     ботов (регистратор, автоматизации Chatplace). Ссылки здесь — как справочник. */
   LEGAL_POLICY: "https://lk.erasovaonline.ru/privacy-policy",
   LEGAL_CONSENT: "https://lk.erasovaonline.ru/consent",
 
@@ -40,10 +42,6 @@ window.CFG = {
     return "https://t.me/" + this.TG_BOT + "?start=razbor_" + type;
   },
 
-  legalFoot: function () {
-    return ' · <a class="foot-link" href="' + this.LEGAL_POLICY + '" target="_blank" rel="noopener">политика</a>' +
-           ' · <a class="foot-link" href="' + this.LEGAL_CONSENT + '" target="_blank" rel="noopener">согласие на обработку ПД</a>';
-  },
 
   /* ── ссылки ── */
 

@@ -63,7 +63,7 @@
         "</div>" +
         '<div class="card"><p>' + esc(INTRO.body) + "</p></div>" +
         '<p class="small" style="margin:4px 2px 0">' + esc(INTRO.note) + "</p>" +
-        '<div class="foot">Анастасия Ерасова · клинический психолог' + CFG.legalFoot() + "</div>" +
+        '<div class="foot">Анастасия Ерасова · клинический психолог</div>' +
       "</div>";
     dock.innerHTML = '<div class="inner"><button class="btn" id="go">Начать · 20 вопросов</button></div>';
     document.getElementById("go").addEventListener("click", function () {
@@ -213,7 +213,7 @@
           '<button class="btn ghost" id="toPerevodchik" style="margin-top:14px">Открыть переводчик</button>' +
         "</div>" +
 
-        '<div class="foot">Анастасия Ерасова · клинический психолог' + CFG.legalFoot() + "</div>" +
+        '<div class="foot">Анастасия Ерасова · клинический психолог</div>' +
       "</div>";
 
     setTimeout(function () {
