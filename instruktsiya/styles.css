@@ -263,3 +263,5 @@ h3 { font-size: 17px; font-weight: 700; letter-spacing: -.01em; }
 }
 .sheet-hint { color: #E8D9DC; font-size: 14px; line-height: 1.5; margin: 16px 0 14px; }
 .sheet .btn.ghost { color: #F7F0EA; border-color: rgba(247, 240, 234, .35); }
+
+.foot-link { color: inherit; text-decoration: underline; text-underline-offset: 2px; }

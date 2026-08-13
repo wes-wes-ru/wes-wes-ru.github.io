@@ -20,10 +20,30 @@ window.CFG = {
   TG_APP_PEREVODCHIK: "",
   TG_APP_INSTRUKTSIYA: "",
 
-  /* Кнопка «Прислать разбор по вашему типу». Разрешение писать в личку само по себе
-     ничего не отправляет: пока в боте нет сценария, который реально шлёт разбор,
-     кнопку не показываем — иначе это обещание, которого никто не выполнит. */
-  RAZBOR_ENABLED: false,
+  /* Кнопка «Прислать разбор по вашему типу». Включать только когда на платформе
+     есть сценарий, который реально шлёт разбор: в Telegram — автоматизации Chatplace
+     на razbor_<тип>, во ВК — пока ничего. Иначе кнопка — обещание, которого
+     никто не выполнит. */
+  RAZBOR_ENABLED_TG: false,   /* поднять после создания автоматизаций в Chatplace */
+  RAZBOR_ENABLED_VK: false,
+
+  /* Документы школы — показываются в подвале приложений */
+  LEGAL_POLICY: "https://lk.erasovaonline.ru/privacy-policy",
+  LEGAL_CONSENT: "https://lk.erasovaonline.ru/consent",
+
+  razborEnabled: function () {
+    return this.platform === "tg" ? this.RAZBOR_ENABLED_TG : this.RAZBOR_ENABLED_VK;
+  },
+
+  /* Ссылка «пришли мне разбор типа X в личку от бота» — только Telegram */
+  razborLink: function (type) {
+    return "https://t.me/" + this.TG_BOT + "?start=razbor_" + type;
+  },
+
+  legalFoot: function () {
+    return ' · <a class="foot-link" href="' + this.LEGAL_POLICY + '" target="_blank" rel="noopener">политика</a>' +
+           ' · <a class="foot-link" href="' + this.LEGAL_CONSENT + '" target="_blank" rel="noopener">согласие на обработку ПД</a>';
+  },
 
   /* ── ссылки ── */
 

@@ -63,7 +63,7 @@
         "</div>" +
         '<div class="card"><p>' + esc(INTRO.body) + "</p></div>" +
         '<p class="small" style="margin:4px 2px 0">' + esc(INTRO.note) + "</p>" +
-        '<div class="foot">Анастасия Ерасова · клинический психолог</div>' +
+        '<div class="foot">Анастасия Ерасова · клинический психолог' + CFG.legalFoot() + "</div>" +
       "</div>";
     dock.innerHTML = '<div class="inner"><button class="btn" id="go">Начать · 20 вопросов</button></div>';
     document.getElementById("go").addEventListener("click", function () {
@@ -213,7 +213,7 @@
           '<button class="btn ghost" id="toPerevodchik" style="margin-top:14px">Открыть переводчик</button>' +
         "</div>" +
 
-        '<div class="foot">Анастасия Ерасова · клинический психолог</div>' +
+        '<div class="foot">Анастасия Ерасова · клинический психолог' + CFG.legalFoot() + "</div>" +
       "</div>";
 
     setTimeout(function () {
@@ -264,12 +264,19 @@
       });
       return;
     }
-    /* «Прислать разбор» включается только когда в сообществе действительно
-       есть сценарий, который его шлёт (CFG.RAZBOR_ENABLED). Иначе кнопка
-       просит разрешение писать в личку и не делает ничего. */
-    if (CFG.RAZBOR_ENABLED && App.canAllowMessages && !state.allowed) {
+    /* «Прислать разбор» включается только когда на платформе есть сценарий,
+       который его реально шлёт (CFG.razborEnabled). В Telegram кнопка ведёт
+       на бота с start=razbor_<тип> — человек жмёт Start и получает разбор,
+       во ВК — старый запрос разрешения на личку. */
+    if (CFG.razborEnabled() && !state.allowed) {
       dock.innerHTML = '<div class="inner"><button class="btn crimson" id="allow">Прислать разбор по вашему типу</button></div>';
       document.getElementById("allow").addEventListener("click", function () {
+        if (App.platform === "tg") {
+          App.set("allowed", "1");
+          state.allowed = true;
+          App.openApp(CFG.razborLink(r.top));
+          return;
+        }
         App.allowMessages().then(function (ok) {
           if (!ok) return;
           state.allowed = true;
