@@ -45,6 +45,17 @@
     }
     paint();
     tg.onEvent("themeChanged", paint);
+    /* Внутри Telegram карточки ведут через бота (?start=…): сначала человек
+       делится номером и попадает в базу, и только потом открывается приложение.
+       В обычном браузере остаются прямые ссылки на страницы. */
+    document.addEventListener("click", function (e) {
+      var a = e.target.closest && e.target.closest("a.item");
+      if (!a) return;
+      e.preventDefault();
+      var word = a.getAttribute("href").indexOf("perevodchik") !== -1 ? "frazy" : "test";
+      tg.openTelegramLink("https://t.me/erasova_psy_bot?start=" + word);
+      try { tg.close(); } catch (err) {}
+    });
   })();
 </script>
 </head>
