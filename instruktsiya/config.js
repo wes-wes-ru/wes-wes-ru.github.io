@@ -17,8 +17,8 @@ window.CFG = {
   TG_CHANNEL_URL: "https://t.me/erasova_psy",
   /* short name мини-аппа из BotFather (/newapp). Пока приложения не заведены —
      ссылка «поделиться» ведёт на бота, а не на конкретное приложение. */
-  TG_APP_PEREVODCHIK: "",
-  TG_APP_INSTRUKTSIYA: "",
+  TG_APP_PEREVODCHIK: "perevodchik",
+  TG_APP_INSTRUKTSIYA: "instrukciya",
 
   /* Кнопка «Прислать разбор по вашему типу». Включать только когда на платформе
      есть сценарий, который реально шлёт разбор: в Telegram — автоматизации Chatplace
