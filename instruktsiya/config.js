@@ -46,6 +46,16 @@ window.CFG = {
     return this.platform === "tg" ? this.RAZBOR_ENABLED_TG : this.RAZBOR_ENABLED_VK;
   },
 
+  /* Подарок «Что сказать себе» (7 фраз, 9 карточек). Во ВК разрешение на
+     сообщения ловит серверный мост и ставит человека на бота Senler
+     «Подарок: Что сказать себе» — поэтому кнопка живёт только там.
+     В Telegram пути выдачи пока нет. */
+  PODAROK_ENABLED_VK: true,
+
+  podarokEnabled: function () {
+    return this.platform === "vk" && this.PODAROK_ENABLED_VK;
+  },
+
   /* Ссылка «пришли мне разбор типа X в личку от бота» — только Telegram */
   razborLink: function (type) {
     return "https://t.me/" + this.TG_BOT + "?start=razbor_" + type;

@@ -14,7 +14,8 @@
     i: 0,
     answers: {},
     joined: false,
-    allowed: false
+    allowed: false,
+    gifted: false
   };
 
   function esc(s) {
@@ -264,6 +265,22 @@
       });
       return;
     }
+    /* Подарок «Что сказать себе»: разрешение на сообщения ловит серверный
+       мост и ставит человека на бота Senler с карточками. */
+    if (CFG.podarokEnabled() && !state.gifted) {
+      dock.innerHTML = '<div class="inner"><button class="btn crimson" id="gift">Подарок: «Что сказать себе»</button></div>';
+      document.getElementById("gift").addEventListener("click", function () {
+        App.allowMessages().then(function (ok) {
+          if (!ok) return;
+          state.gifted = true;
+          App.set("gifted", "1");
+          App.haptic("success");
+          App.toast("Готово. Подарок придёт в личные сообщения");
+          renderResultDock(r);
+        });
+      });
+      return;
+    }
     /* «Прислать разбор» включается только когда на платформе есть сценарий,
        который его реально шлёт (CFG.razborEnabled). В Telegram кнопка ведёт
        на бота с start=razbor_<тип> — человек жмёт Start и получает разбор,
@@ -291,48 +308,63 @@
   }
 
 
-  /* ── экран подписки (только ВК): вступить в сообщество + разрешить сообщения.
-     Ключ gate2 в хранилище — прошедшим не показываем. Обещание разбора
-     выполняет подписная страница Senler (группа «Определи свой сценарий»). ── */
+  /* ── экран подписки (только ВК), два шага. Раньше вступление и разрешение
+     сообщений вызывались подряд — второй системный диалог гиб под первым,
+     и разрешение давали ~1% вступивших. Теперь каждый шаг — отдельный тап.
+     Мягкость обязательна: любая ошибка моста и «Позже» пускают внутрь.
+     Ключ gate2 в хранилище — прошедшим не показываем. Подарок доставляет
+     серверный мост: разрешение на сообщения → бот Senler «Что сказать себе». ── */
   function renderGate(next) {
     app.innerHTML =
       '<div class="wrap fade">' +
         '<div class="hero">' +
           '<div class="kicker">Подслушано у психолога</div>' +
           '<h1 class="big">Сначала подпишемся</h1>' +
-          '<p class="lead" style="margin-top:18px">Приложение открывается после подписки на сообщество ' +
-          'и разрешения на сообщения — так вы будете получать разборы и практики, ' +
-          'которые здесь начинаются.</p>' +
+          '<p class="lead" style="margin-top:18px">Приложение открывается после подписки ' +
+          'на сообщество — там каждый день разборы и практики, которые здесь начинаются.</p>' +
         '</div>' +
-        '<div class="card"><p>Бонус за подписку: разбор «Определи свой сценарий» — семь сценариев, ' +
-        'по которым повторяются отношения, и потребность за каждым. Придёт в личные сообщения.</p></div>' +
+        '<div class="card"><p>Дальше — подарок за подписку: «Что сказать себе», ' +
+        'семь фраз, которые работают лучше, чем «соберись».</p></div>' +
         '<div class="foot">Анастасия Ерасова · клинический психолог</div>' +
       '</div>';
     dock.innerHTML = '<div class="inner"><button class="btn" id="gate-go">Подписаться и продолжить</button></div>';
-    var tries = 0;
     document.getElementById("gate-go").addEventListener("click", function () {
-      var btn = document.getElementById("gate-go");
-      btn.disabled = true;
-      tries++;
-      App.follow().then(function (f) {
-        return App.allowMessages().then(function (ok) {
-          /* Тому, кто уже состоит в сообществе, ВК не даёт вступить второй раз:
-             VKWebAppJoinGroup падает с ошибкой, и f.ok приходит false. Раньше
-             таких разворачивали — то есть ровно своих же давних читателей.
-             Поэтому пускаем, если сработало хоть что-то одно, а со второго
-             клика — в любом случае: лучше открыть тренажёр, чем гонять
-             человека по кругу. */
-          if (f.ok || ok || tries >= 2) {
-            App.set("gate2", "1");
-            App.haptic("success");
-            next();
-            return;
-          }
-          btn.disabled = false;
-          App.toast("Приложение откроется после подписки — попробуйте ещё раз");
-        });
+      document.getElementById("gate-go").disabled = true;
+      /* Тому, кто уже состоит в сообществе, VKWebAppJoinGroup возвращает
+         ошибку — это свой же давний читатель, его не разворачиваем. */
+      App.follow().then(function () { renderGateGift(next); });
+    });
+  }
+
+  function renderGateGift(next) {
+    function pass() { App.set("gate2", "1"); next(); }
+    app.innerHTML =
+      '<div class="wrap fade">' +
+        '<div class="hero">' +
+          '<div class="kicker">Подарок за подписку</div>' +
+          '<h1 class="big">Что сказать себе</h1>' +
+          '<p class="lead" style="margin-top:18px">Семь фраз, которые работают лучше, чем ' +
+          '«соберись», — на семь ситуаций, где внутренний голос бьёт первым.</p>' +
+        '</div>' +
+        '<div class="card"><p>Нажмите «Прислать подарок» и разрешите сообщения — ' +
+        'карточки придут в личные сообщения сообщества.</p></div>' +
+        '<div class="foot">Анастасия Ерасова · клинический психолог</div>' +
+      '</div>';
+    dock.innerHTML = '<div class="inner">' +
+      '<button class="btn crimson" id="gift-go">Прислать подарок</button>' +
+      '<button class="btn ghost" id="gift-skip" style="margin-top:10px">Позже</button></div>';
+    document.getElementById("gift-go").addEventListener("click", function () {
+      document.getElementById("gift-go").disabled = true;
+      App.allowMessages().then(function (ok) {
+        if (ok) {
+          App.set("gifted", "1");
+          App.haptic("success");
+          App.toast("Готово. Подарок придёт в личные сообщения");
+        }
+        pass();
       });
     });
+    document.getElementById("gift-skip").addEventListener("click", pass);
   }
 
   function withGate(next) {
@@ -347,9 +379,10 @@
 
   App.init();
 
-  Promise.all([App.get("joined"), App.get("allowed")]).then(function (v) {
+  Promise.all([App.get("joined"), App.get("allowed"), App.get("gifted")]).then(function (v) {
     state.joined = v[0] === "1";
     state.allowed = v[1] === "1";
+    state.gifted = v[2] === "1";
     withGate(renderIntro);
   });
 
