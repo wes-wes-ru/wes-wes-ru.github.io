@@ -33,6 +33,15 @@ window.CFG = {
   LEGAL_POLICY: "https://lk.erasovaonline.ru/privacy-policy",
   LEGAL_CONSENT: "https://lk.erasovaonline.ru/consent",
 
+  /* Экран подписки перед контентом (только ВКонтакте): человек вступает в
+     сообщество и разрешает сообщения — дальше открывается приложение.
+     Включён 17.08.2026 по решению Натальи. */
+  ALLOW_GATE_VK: true,
+
+  allowGate: function () {
+    return this.platform === "vk" && this.ALLOW_GATE_VK;
+  },
+
   razborEnabled: function () {
     return this.platform === "tg" ? this.RAZBOR_ENABLED_TG : this.RAZBOR_ENABLED_VK;
   },

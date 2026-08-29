@@ -244,6 +244,7 @@ window.App = (function () {
   }
 
   return {
+    getLaunchParams: function () { return Promise.resolve(null); },
     platform: "tg", native: inTG, init: init,
     followLabel: "Читать канал Насти",
     followThanks: "",                 /* подписку подтвердить нечем — не благодарим авансом */

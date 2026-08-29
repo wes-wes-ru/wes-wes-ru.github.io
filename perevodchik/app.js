@@ -282,6 +282,59 @@
     }
   });
 
+
+  /* ── экран подписки (только ВК): вступить в сообщество + разрешить сообщения.
+     Ключ gate2 в хранилище — прошедшим не показываем. Обещание разбора
+     выполняет подписная страница Senler (группа «Определи свой сценарий»). ── */
+  function renderGate(next) {
+    app.innerHTML =
+      '<div class="wrap fade">' +
+        '<div class="hero">' +
+          '<div class="kicker">Подслушано у психолога</div>' +
+          '<h1 class="big">Сначала подпишемся</h1>' +
+          '<p class="lead" style="margin-top:18px">Приложение открывается после подписки на сообщество ' +
+          'и разрешения на сообщения — так вы будете получать разборы и практики, ' +
+          'которые здесь начинаются.</p>' +
+        '</div>' +
+        '<div class="card"><p>Бонус за подписку: разбор «Определи свой сценарий» — семь сценариев, ' +
+        'по которым повторяются отношения, и потребность за каждым. Придёт в личные сообщения.</p></div>' +
+        '<div class="foot">Анастасия Ерасова · клинический психолог</div>' +
+      '</div>';
+    dock.innerHTML = '<div class="inner"><button class="btn" id="gate-go">Подписаться и продолжить</button></div>';
+    var tries = 0;
+    document.getElementById("gate-go").addEventListener("click", function () {
+      var btn = document.getElementById("gate-go");
+      btn.disabled = true;
+      tries++;
+      App.follow().then(function (f) {
+        return App.allowMessages().then(function (ok) {
+          /* Тому, кто уже состоит в сообществе, ВК не даёт вступить второй раз:
+             VKWebAppJoinGroup падает с ошибкой, и f.ok приходит false. Раньше
+             таких разворачивали — то есть ровно своих же давних читателей.
+             Поэтому пускаем, если сработало хоть что-то одно, а со второго
+             клика — в любом случае: лучше открыть тренажёр, чем гонять
+             человека по кругу. */
+          if (f.ok || ok || tries >= 2) {
+            App.set("gate2", "1");
+            App.haptic("success");
+            next();
+            return;
+          }
+          btn.disabled = false;
+          App.toast("Приложение откроется после подписки — попробуйте ещё раз");
+        });
+      });
+    });
+  }
+
+  function withGate(next) {
+    Promise.all([App.get("gate2"), App.getLaunchParams()]).then(function (g) {
+      var passed = g[0] === "1";
+      var inVKEnv = !!g[1];
+      if (CFG.allowGate() && inVKEnv && !passed) renderGate(next); else next();
+    });
+  }
+
   /* ───────────── старт ───────────── */
 
   App.init();
@@ -289,6 +342,7 @@
   Promise.all([App.get("fav"), App.get("joined")]).then(function (r) {
     state.fav = (r[0] || "").split(",").filter(Boolean);
     state.joined = r[1] === "1";
+    withGate(function () {
 
     /* прямая ссылка на карточку: во ВК это #ne-revi, в Telegram — ?startapp=ne-revi */
     var param = App.startParam();
@@ -300,6 +354,7 @@
     } else {
       renderList();
     }
+    });
   });
 
 })();
